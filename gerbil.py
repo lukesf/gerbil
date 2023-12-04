@@ -1019,12 +1019,20 @@ class Gerbil:
             self.logger.error("{}: Could not parse gcode parser report: '{}'".format(self.name, line))
         
     def _update_state(self, line):
-        m = re.match("<(.*?),MPos:(.*?),WPos:(.*?)>", line)
+        print(line)
+        #m = re.match("<(.*?),MPos:(.*?),WPos:(.*?)>", line)
+        m = re.match("<(.*?)\|MPos:(.*?)\|FS:.*?\|WCO:(.*?)>", line)
+        if (m is None) :
+            m = re.match("<(.*?)\|MPos:(.*?)\|FS:.*?>", line)
+            self.cwpos = self._last_cwpos
+        else:
+            wpos_parts = m.group(3).split(",")
+            self.cwpos = (float(wpos_parts[0]), float(wpos_parts[1]), float(wpos_parts[2]))
         self.cmode = m.group(1)
         mpos_parts = m.group(2).split(",")
-        wpos_parts = m.group(3).split(",")
+        #wpos_parts = m.group(3).split(",")
         self.cmpos = (float(mpos_parts[0]), float(mpos_parts[1]), float(mpos_parts[2]))
-        self.cwpos = (float(wpos_parts[0]), float(wpos_parts[1]), float(wpos_parts[2]))
+        #self.cwpos = (float(wpos_parts[0]), float(wpos_parts[1]), float(wpos_parts[2]))
 
         if (self.cmode != self._last_cmode or
             self.cmpos != self._last_cmpos or
